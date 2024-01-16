@@ -1,0 +1,9 @@
+__pycache__/
+
+# Environments
+venv/
+venv.bak/
+
+# IDE
+.idea/
+/.pytest_cache/
