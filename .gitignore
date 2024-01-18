@@ -1,0 +1,11 @@
+# Byte-compiled / optimized / DLL files
+src/__pycache__/
+tests/__pycache__/
+__pycache__/
+
+# Environments
+venv/
+
+# IDE
+.idea/
+/.pytest_cache/
