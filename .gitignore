@@ -1,0 +1,4 @@
+.idea/
+/DDT/__pycache__/
+/DDT/.pytest_cache/
+/venv/
