@@ -32,9 +32,6 @@ def test_2():
     assert len(list_comments) == 500
 
 
-headers = {"Content-Type": "application/json; charset=utf-8"}
-
-
 def test_3():
     """Test #3 - Creating a resource"""
     test_3 = base_request.post("posts", {
