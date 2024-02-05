@@ -1,76 +1,91 @@
 import json
 import random
-from random import randint
-
 import pytest
-
 from DDT.base_request import BaseRequest
 
-BASE_URL = 'https://dog.ceo/api/'
+BASE_URL = 'https://api.openbrewerydb.org/v1/breweries'
 base_request = BaseRequest(BASE_URL)
 
 
 def test_1():
-    """Test #1 - LIST ALL BREEDS"""
-    response = base_request.get('breeds/list/all')
-    breeds = json.loads(response.text)['message']
-    key_breeds = list(breeds.keys())
-    assert response.ok is True
-    assert json.loads(response.text)['status'] == 'success'
-    return key_breeds
+    """Test #1 - LIST BREWERIES"""
+    test1 = base_request.get('')
+    assert test1.ok is True
 
 
-list_breeds = test_1()
+def test_2():
+    """Test #2 - Random Brewery"""
+    test1 = base_request.get("random")
+    assert test1.ok is True
 
 
-@pytest.mark.parametrize('breed', [random.choice(list_breeds)])
-def test_2(breed):
-    """Test #2 - LIST ALL SUB-BREEDS FROM A BREED"""
-    response = base_request.get(f'breed/{breed}/list')
-    assert response.ok is True
-    assert json.loads(response.text)['status'] == 'success'
+type = [("micro"), ("nano"),
+        ("regional"), ("brewpub"),
+        ("large"), ("planning"),
+        ("bar"), ("contract"),
+        ("proprietor"), ("closed")]
 
 
-@pytest.mark.parametrize('num', [randint(0, 50)])
-def test_3_1(num):
-    """Test #3_1 - DISPLAY MULTIPLE RANDOM IMAGES if NUM is up to 50"""
-    response = base_request.get(f'breeds/image/random/{num}')
-    assert len(json.loads(response.text)['message']) == num
-    assert response.ok is True
+@pytest.mark.parametrize("type",
+                         type)
+def test_3(type):
+    """Test #3 - BY TYPE"""
+    test_3 = base_request.get(f"?by_type={type}")
+    assert test_3.ok is True
 
 
-@pytest.mark.parametrize('num', [51])
-def test_3_2(num):
-    """Test #3_2 - DISPLAY MULTIPLE RANDOM IMAGES if NUM is more than 50"""
-    response = base_request.get(f'breeds/image/random/{num}')
-    assert response.ok is True
-    assert len(json.loads(response.text)['message']) == 50
+@pytest.mark.parametrize("size",
+                         [random.randint(0, 50)])
+def test_4_1(size):
+    """Test #4_1 - BY SIZE - UP TO 50"""
+    test_4_1 = base_request.get(f"random?size={size}")
+    list = json.loads(test_4_1.text)
+
+    list_id = []
+    for i in list:
+        list_result = {
+            key: value
+            for key, value in i.items()
+            if key in "id"
+        }
+        list_id.append(list_result)
+
+    assert len(list) == size
+    assert test_4_1.ok is True
 
 
-breeds_and_sub_breeds = [('mastiff', 'bull'),
-                         ('african', ''),
-                         ('collie', 'border')]
+@pytest.mark.parametrize("size",
+                         [51])
+def test_4_2(size):
+    """Test #4_2 - BY SIZE - MORE THAN 50"""
+    test_4_2 = base_request.get(f"random?size={size}")
+    list = json.loads(test_4_2.text)
+
+    list_id = []
+    for i in list:
+        list_result = {
+            key: value
+            for key, value in i.items()
+            if key in "id"
+        }
+        list_id.append(list_result)
+
+    assert len(list) == 50
+    assert test_4_2.ok is True
 
 
-@pytest.mark.parametrize("breed, breed_sub",
-                         breeds_and_sub_breeds)
-def test_4(breed, breed_sub):
-    """Test #4 - SINGLE RANDOM IMAGE FROM A SUB BREED COLLECTION"""
-    if breed_sub != '':
-        response = base_request.get(f'breed/{breed}/{breed_sub}/images/random')
-    else:
-        response = base_request.get(f'breed/{breed}/images/random')
-    assert response.ok is True
-    assert json.loads(response.text)['status'] == 'success'
+type = [('micro'), ('nano'), ('regional'),
+        ('brewpub'), ('large'), ('planning'),
+        ('bar'), ('contract'), ('proprietor'),
+        ('closed')]
 
 
-@pytest.mark.parametrize("breed, breed_sub",
-                         breeds_and_sub_breeds)
-def test_5(breed, breed_sub):
-    """Test #5 - LIST ALL SUB-BREED IMAGES"""
-    if breed_sub != '':
-        response = base_request.get(f'breed/{breed}/{breed_sub}/images')
-    else:
-        response = base_request.get(f'breed/{breed}/images')
-    assert response.ok is True
-    assert json.loads(response.text)['status'] == 'success'
+@pytest.mark.parametrize("type",
+                         type)
+def test_5(type):
+    """Test #5 - BY TYPE"""
+    test_5 = base_request.get(f"?by_type={type}")
+    list = json.loads(test_5.text)
+    for i in range(len(list)):
+        assert list[i].get('brewery_type') == type
+        assert test_5.ok is True
